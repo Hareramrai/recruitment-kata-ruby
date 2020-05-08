@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'delegate'
+
 class GildedRose
   AGE_BRIE = 'Aged Brie'
   BACKSTAGE_PASSESS = 'Backstage passes to a TAFKAL80ETC concert'
@@ -18,28 +20,15 @@ class GildedRose
   private
 
   def update_item(item)
-    item.sell_in = item.sell_in - 1 if item.name != SULFURAS
-
     if item.name == AGE_BRIE
-      update_item_quality(item, 1)
-      update_item_quality(item, 1) if item.expired?
+      AgedBrieUpdater.new(item).update
     elsif item.name == BACKSTAGE_PASSESS
-      update_item_quality(item, 1)
-      update_item_quality(item, 1) if item.sell_in < 11
-      update_item_quality(item, 1) if item.sell_in < 6
-
-      update_item_quality(item, -item.quality) if item.expired?
-    elsif item.name != SULFURAS
-      update_item_quality(item, -1)
-      update_item_quality(item, -1) if item.expired?
+      BackStagePassUpdater.new(item).update
+    elsif item.name == SULFURAS
+      BaseItemUpdater.new(item).update
+    else
+      NormalUpdater.new(item).update
     end
-  end
-
-  def update_item_quality(item, quality)
-    next_value = item.quality + quality
-    return if next_value > 50 || next_value.negative?
-
-    item.quality += quality
   end
 end
 
@@ -62,5 +51,45 @@ class Item
 
   def to_s
     "#{@name}, #{@sell_in}, #{@quality}"
+  end
+end
+
+class BaseItemUpdater < SimpleDelegator
+  def update; end
+
+  private
+
+  def update_quality(delta)
+    next_value = quality + delta
+    return if next_value > 50 || next_value.negative?
+
+    self.quality = next_value
+  end
+end
+
+class AgedBrieUpdater < BaseItemUpdater
+  def update
+    self.sell_in -= 1
+    update_quality(1)
+    update_quality(1) if expired?
+  end
+end
+
+class BackStagePassUpdater < BaseItemUpdater
+  def update
+    self.sell_in -= 1
+    update_quality(1)
+    update_quality(1) if sell_in < 11
+    update_quality(1) if sell_in < 6
+
+    update_quality(-quality) if expired?
+  end
+end
+
+class NormalUpdater < BaseItemUpdater
+  def update
+    self.sell_in -= 1
+    update_quality(-1)
+    update_quality(-1) if expired?
   end
 end

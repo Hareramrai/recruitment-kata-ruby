@@ -15,3 +15,5 @@
       Assignment Branch Condition size for update_item is too high. [<1, 23, 20> 30.5/15](convention:Metrics/AbcSize) Cyclomatic complexity for update_item is too high. [11/6](convention:Metrics/CyclomaticComplexity) Method has too many lines. [20/10](convention:Metrics/MethodLength)
 
 5.  Refactored code to move coherent code to the same place.
+
+6.  Refactored code to move code related to item types like NORMAL, AGE BRIE, BACKSTAGE PASSESS and SULFURAS to a new service like class which does only one operation, which is update item. Also, I have used simple delegator instead of def_delegators becuase for def_delegators I had to write all delegated methods.
