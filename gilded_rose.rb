@@ -21,12 +21,10 @@ class GildedRose
     if (item.name != AGE_BRIE) && (item.name != BACKSTAGE_PASSESS)
       update_item_quality(item, -1) if item.name != SULFURAS
     else
-      if item.quality < 50
-        update_item_quality(item, 1)
-        if item.name == BACKSTAGE_PASSESS
-          update_item_quality(item, 1) if item.sell_in < 11
-          update_item_quality(item, 1) if item.sell_in < 6
-        end
+      update_item_quality(item, 1)
+      if item.name == BACKSTAGE_PASSESS
+        update_item_quality(item, 1) if item.sell_in < 11
+        update_item_quality(item, 1) if item.sell_in < 6
       end
     end
 
