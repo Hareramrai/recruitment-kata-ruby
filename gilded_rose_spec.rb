@@ -169,7 +169,35 @@ describe BackStagePassUpdater do
 
   describe '#update' do
     it 'updates the quality & sell_in' do
-      expect { subject.update }.to change { item.quality }.by(3).and(change { item.sell_in }.by(-1))
+      expect { subject.update }
+        .to change { item.quality }.by(3).and(change { item.sell_in }.by(-1))
+    end
+  end
+end
+
+describe ConjuredUpdater do
+  let(:item) { Item.new GildedRose::CONJURED, sell_in, quality }
+  subject { described_class.new(item) }
+
+  describe '#update' do
+    context 'before expired' do
+      let(:sell_in) { 10 }
+      let(:quality) { 10 }
+
+      it 'reduces the quality by 2 and sell_in by 1' do
+        expect { subject.update }
+          .to change { item.quality }.by(-2).and(change { item.sell_in }.by(-1))
+      end
+    end
+
+    context 'after expired' do
+      let(:sell_in) { 0 }
+      let(:quality) { 10 }
+
+      it 'reduces the quality by 4 and sell_in by 1' do
+        expect { subject.update }
+          .to change { item.quality }.by(-4).and(change { item.sell_in }.by(-1))
+      end
     end
   end
 end

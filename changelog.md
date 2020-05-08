@@ -19,3 +19,5 @@
 6.  Refactored code to move code related to item types like NORMAL, AGE BRIE, BACKSTAGE PASSESS and SULFURAS to a new service like class which does only one operation, which is update item. Also, I have used simple delegator instead of def_delegators becuase for def_delegators I had to write all delegated methods.
 
 7.  Used lookup to fix if-else-if problem for finding the right updater service for updating the item.
+
+8.  Finally add feature for Conjured items by adding a new updater service class.

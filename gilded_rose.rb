@@ -41,15 +41,25 @@ class NormalUpdater < BaseItemUpdater
   end
 end
 
+class ConjuredUpdater < BaseItemUpdater
+  def update
+    self.sell_in -= 1
+    update_quality(-2)
+    update_quality(-2) if expired?
+  end
+end
+
 class GildedRose
   AGE_BRIE = 'Aged Brie'
   BACKSTAGE_PASSESS = 'Backstage passes to a TAFKAL80ETC concert'
   SULFURAS = 'Sulfuras, Hand of Ragnaros'
+  CONJURED = 'Conjured'
 
   ITEM_UPDATER_LOOKUP = {
     'Aged Brie' => AgedBrieUpdater,
     'Backstage passes to a TAFKAL80ETC concert' => BackStagePassUpdater,
-    'Sulfuras, Hand of Ragnaros' => BaseItemUpdater
+    'Sulfuras, Hand of Ragnaros' => BaseItemUpdater,
+    'Conjured' => ConjuredUpdater
   }.freeze
 
   DEFAULT_UPDATER = NormalUpdater
