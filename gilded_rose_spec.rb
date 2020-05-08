@@ -75,7 +75,7 @@ describe GildedRose do
       let(:name) { 'Backstage passes to a TAFKAL80ETC concert' }
 
       context 'when sell_in is more than 10 days' do
-        let(:sell_in) { 11 }
+        let(:sell_in) { 12 }
 
         it 'increases the quality by one' do
           GildedRose.new([item]).update_quality
@@ -124,6 +124,16 @@ describe GildedRose do
         expect(item.quality).to eq(quality)
         expect(item.sell_in).to eq(sell_in)
       end
+    end
+  end
+end
+
+describe Item do
+  let(:item) { Item.new 'name', -1, 5 }
+
+  describe '#expired?' do
+    it 'returns true when sell_in less than 0' do
+      expect(item.expired?).to be_truthy
     end
   end
 end

@@ -18,28 +18,20 @@ class GildedRose
   private
 
   def update_item(item)
+    item.sell_in = item.sell_in - 1 if item.name != SULFURAS
+
     if item.name == AGE_BRIE
       update_item_quality(item, 1)
+      update_item_quality(item, 1) if item.expired?
     elsif item.name == BACKSTAGE_PASSESS
       update_item_quality(item, 1)
       update_item_quality(item, 1) if item.sell_in < 11
       update_item_quality(item, 1) if item.sell_in < 6
+
+      update_item_quality(item, -item.quality) if item.expired?
     elsif item.name != SULFURAS
       update_item_quality(item, -1)
-    end
-
-    item.sell_in = item.sell_in - 1 if item.name != SULFURAS
-
-    if item.sell_in.negative?
-      if item.name == AGE_BRIE
-        update_item_quality(item, 1)
-      elsif item.name == BACKSTAGE_PASSESS
-        update_item_quality(item, -item.quality)
-      elsif item.name == SULFURAS
-
-      else
-        update_item_quality(item, -1)
-      end
+      update_item_quality(item, -1) if item.expired?
     end
   end
 
@@ -58,6 +50,10 @@ class Item
     @name = name
     @sell_in = sell_in
     @quality = quality
+  end
+
+  def expired?
+    sell_in.negative?
   end
 
   def to_h
