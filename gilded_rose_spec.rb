@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(File.dirname(__FILE__), 'gilded_rose')
 
 describe GildedRose do
@@ -36,7 +38,6 @@ describe GildedRose do
         end
       end
     end
-
 
     context 'when the item is "Aged Brie"' do
       let(:name) { 'Aged Brie' }

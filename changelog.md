@@ -8,3 +8,8 @@
 2.  Abstract update item logic to a private method & create constant for magic strings.
 
 3.  Add update_item_quality method and remove unnecessary condition check around update logic.
+
+4.  Refactored the update_item method and try to use positive statement.
+
+    - Also, update_item method has below problem.
+      Assignment Branch Condition size for update_item is too high. [<1, 23, 20> 30.5/15](convention:Metrics/AbcSize) Cyclomatic complexity for update_item is too high. [11/6](convention:Metrics/CyclomaticComplexity) Method has too many lines. [20/10](convention:Metrics/MethodLength)

@@ -18,27 +18,27 @@ class GildedRose
   private
 
   def update_item(item)
-    if (item.name != AGE_BRIE) && (item.name != BACKSTAGE_PASSESS)
-      update_item_quality(item, -1) if item.name != SULFURAS
-    else
+    if item.name == AGE_BRIE
       update_item_quality(item, 1)
-      if item.name == BACKSTAGE_PASSESS
-        update_item_quality(item, 1) if item.sell_in < 11
-        update_item_quality(item, 1) if item.sell_in < 6
-      end
+    elsif item.name == BACKSTAGE_PASSESS
+      update_item_quality(item, 1)
+      update_item_quality(item, 1) if item.sell_in < 11
+      update_item_quality(item, 1) if item.sell_in < 6
+    elsif item.name != SULFURAS
+      update_item_quality(item, -1)
     end
 
     item.sell_in = item.sell_in - 1 if item.name != SULFURAS
 
-    if item.sell_in < 0
-      if item.name != AGE_BRIE
-        if item.name != BACKSTAGE_PASSESS
-          update_item_quality(item, -1) if item.name != SULFURAS
-        else
-          update_item_quality(item, -item.quality)
-        end
-      else
+    if item.sell_in.negative?
+      if item.name == AGE_BRIE
         update_item_quality(item, 1)
+      elsif item.name == BACKSTAGE_PASSESS
+        update_item_quality(item, -item.quality)
+      elsif item.name == SULFURAS
+
+      else
+        update_item_quality(item, -1)
       end
     end
   end
