@@ -1,54 +1,84 @@
+# frozen_string_literal: true
+
+require 'delegate'
+class BaseItemUpdater < SimpleDelegator
+  def update; end
+
+  private
+
+  def update_quality(delta)
+    next_value = quality + delta
+    return if next_value > 50 || next_value.negative?
+
+    self.quality = next_value
+  end
+end
+
+class AgedBrieUpdater < BaseItemUpdater
+  def update
+    self.sell_in -= 1
+    update_quality(1)
+    update_quality(1) if expired?
+  end
+end
+
+class BackStagePassUpdater < BaseItemUpdater
+  def update
+    self.sell_in -= 1
+    update_quality(1)
+    update_quality(1) if sell_in < 11
+    update_quality(1) if sell_in < 6
+
+    update_quality(-quality) if expired?
+  end
+end
+
+class NormalUpdater < BaseItemUpdater
+  def update
+    self.sell_in -= 1
+    update_quality(-1)
+    update_quality(-1) if expired?
+  end
+end
+
+class ConjuredUpdater < BaseItemUpdater
+  def update
+    self.sell_in -= 1
+    update_quality(-2)
+    update_quality(-2) if expired?
+  end
+end
+
 class GildedRose
+  AGE_BRIE = 'Aged Brie'
+  BACKSTAGE_PASSESS = 'Backstage passes to a TAFKAL80ETC concert'
+  SULFURAS = 'Sulfuras, Hand of Ragnaros'
+  CONJURED = 'Conjured'
+
+  ITEM_UPDATER_LOOKUP = {
+    'Aged Brie' => AgedBrieUpdater,
+    'Backstage passes to a TAFKAL80ETC concert' => BackStagePassUpdater,
+    'Sulfuras, Hand of Ragnaros' => BaseItemUpdater,
+    'Conjured' => ConjuredUpdater
+  }.freeze
+
+  DEFAULT_UPDATER = NormalUpdater
+
   def initialize(items)
     @items = items
   end
 
-  def update_quality()
+  def update_quality
     @items.each do |item|
-      if item.name != "Aged Brie" and item.name != "Backstage passes to a TAFKAL80ETC concert"
-        if item.quality > 0
-          if item.name != "Sulfuras, Hand of Ragnaros"
-            item.quality = item.quality - 1
-          end
-        end
-      else
-        if item.quality < 50
-          item.quality = item.quality + 1
-          if item.name == "Backstage passes to a TAFKAL80ETC concert"
-            if item.sell_in < 11
-              if item.quality < 50
-                item.quality = item.quality + 1
-              end
-            end
-            if item.sell_in < 6
-              if item.quality < 50
-                item.quality = item.quality + 1
-              end
-            end
-          end
-        end
-      end
-      if item.name != "Sulfuras, Hand of Ragnaros"
-        item.sell_in = item.sell_in - 1
-      end
-      if item.sell_in < 0
-        if item.name != "Aged Brie"
-          if item.name != "Backstage passes to a TAFKAL80ETC concert"
-            if item.quality > 0
-              if item.name != "Sulfuras, Hand of Ragnaros"
-                item.quality = item.quality - 1
-              end
-            end
-          else
-            item.quality = item.quality - item.quality
-          end
-        else
-          if item.quality < 50
-            item.quality = item.quality + 1
-          end
-        end
-      end
+      update_item(item)
     end
+  end
+
+  private
+
+  def update_item(item)
+    updater_klass = ITEM_UPDATER_LOOKUP.fetch(item.name, DEFAULT_UPDATER)
+    updater_klass.new(item).update
   end
 end
 
@@ -60,12 +90,16 @@ class Item
     @sell_in = sell_in
     @quality = quality
   end
-  
+
+  def expired?
+    sell_in.negative?
+  end
+
   def to_h
     { name: @name, sell_in: @sell_in, quality: @quality }
   end
 
-  def to_s()
+  def to_s
     "#{@name}, #{@sell_in}, #{@quality}"
   end
 end
